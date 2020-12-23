@@ -159,7 +159,7 @@ let _ = compiler   "../../fichiersRat/src-rat-tam-test/testif2.rat" in ()
 
 let%test_unit "code_factiter" = 
   let _ = compiler   "../../fichiersRat/src-rat-tam-test/factiter.rat" in ()
-
+(*
 
 (* ------------------------------ *)
 (* Avec fonction *)
@@ -358,3 +358,4 @@ let%test_unit "code_complique" =
   let _ = compiler   "../../fichiersRat/src-rat-tam-test/complique.rat" in ()
 
 
+*)

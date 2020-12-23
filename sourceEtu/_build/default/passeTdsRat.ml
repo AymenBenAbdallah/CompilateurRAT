@@ -17,7 +17,42 @@ struct
 (* Vérifie la bonne utilisation des identifiants et tranforme l'expression
 en une expression de type AstTds.expression *)
 (* Erreur si mauvaise utilisation des identifiants *)
-let analyse_tds_expression tds e = True (* failwith "todo"*)
+let rec analyse_tds_expression tds e = 
+  match e with
+    | AstSyntax.True -> True
+    | AstSyntax.False -> False
+    | AstSyntax.Entier n -> Entier n
+    | AstSyntax.Binaire (b, e1, e2) -> 
+      let ne1 = analyse_tds_expression tds e1 in
+      let ne2 = analyse_tds_expression tds e2 in
+      Binaire(b, ne1, ne2)
+    | AstSyntax.Rationnel(e1, e2) ->
+      let ne1 = analyse_tds_expression tds e1 in
+      let ne2 = analyse_tds_expression tds e2 in
+      Rationnel(ne1, ne2)
+    | AstSyntax.Numerateur e ->
+      let ne = analyse_tds_expression tds e in
+      Numerateur ne
+    | AstSyntax.Denominateur e ->
+      let ne = analyse_tds_expression tds e in
+      Denominateur ne
+    | AstSyntax.Ident id ->
+      begin
+        match chercherGlobalement tds id with
+          | None -> raise (IdentifiantNonDeclare id)
+          | Some infoAstId ->
+            match (info_ast_to_info infoAstId) with
+              | InfoFun (id, _, _) -> raise (MauvaiseUtilisationIdentifiant id)
+              | _ -> Ident infoAstId
+      end
+    | AstSyntax.AppelFonction (id, le) -> 
+      match (chercherGlobalement tds id) with
+        | None -> raise (IdentifiantNonDeclare id)
+        | Some infoAstId -> 
+          match (info_ast_to_info infoAstId) with
+            | InfoFun (id, _, _) -> AppelFonction(infoAstId, List.map (analyse_tds_expression tds) le)
+            | _ -> raise (MauvaiseUtilisationIdentifiant id)
+
 
 
 (* analyse_tds_instruction : AstSyntax.instruction -> tds -> AstTds.instruction *)
@@ -130,14 +165,44 @@ and analyse_tds_bloc tds li =
    nli
 
 
+(* analyser_tds_param : tds * expression list -> (typ * info_ast)list *)
+(* Paramètre tds : la table des symboles locale *)
+(* Paramètre : la liste des paramètres à analyser *)
+(* Analyse les paramètres en entrée d'une fonction *)
+(* Erreur si double declaration d'un même paramètre *)
+let analyser_tds_param (tdsLocale,liste_param) = 
+  List.fold_right (fun (typp,nom_param) tq -> match (chercherLocalement tdsLocale nom_param) with
+                                              | None -> (let info_p = Tds.InfoVar (nom_param,typp,0,"") in
+                                                        let info_ast_p =  Tds.info_to_info_ast info_p in
+                                                        Tds.ajouter tdsLocale nom_param info_ast_p;
+                                                        (typp,info_ast_p)::tq)
+                                              | Some _ -> (raise (DoubleDeclaration nom_param))) liste_param []
+
+
+
 (* analyse_tds_fonction : AstSyntax.fonction -> AstTds.fonction *)
 (* Paramètre tds : la table des symboles courante *)
 (* Paramètre : la fonction à analyser *)
 (* Vérifie la bonne utilisation des identifiants et tranforme la fonction
 en une fonction de type AstTds.fonction *)
 (* Erreur si mauvaise utilisation des identifiants *)
-let analyse_tds_fonction maintds (AstSyntax.Fonction(t,n,lp,li,e))  =
-  failwith "todo"
+let analyse_tds_fonction maintds (AstSyntax.Fonction(t,n,lp,li,e))  = 
+  match chercherGlobalement maintds n with
+    | Some _ -> (raise (DoubleDeclaration n))
+    | None -> begin
+                let types_param = List.map (fst) lp in
+                let infof = Tds.InfoFun (n,t,types_param) in
+                let info_ast_f = (Tds.info_to_info_ast infof) in
+                let tdsLocale = creerTDSFille maintds in
+                ajouter tdsLocale n (info_to_info_ast (Tds.InfoFun (n,t,types_param)));
+                let info_param = analyser_tds_param (tdsLocale,lp) in
+                let linstru_analysees = List.map (analyse_tds_instruction tdsLocale) li in
+                let retour_analyse = analyse_tds_expression tdsLocale e in
+                ajouter maintds n (info_to_info_ast (Tds.InfoFun (n,t,types_param)));
+                AstTds.Fonction(t,info_ast_f,info_param,linstru_analysees,retour_analyse)
+                
+    end
+
   
 
 (* analyser : AstSyntax.ast -> AstTds.ast *)
