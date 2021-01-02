@@ -42,16 +42,20 @@ let rec analyse_tds_expression tds e =
           | None -> raise (IdentifiantNonDeclare id)
           | Some infoAstId ->
             match (info_ast_to_info infoAstId) with
-              | InfoFun (id, _, _) -> raise (MauvaiseUtilisationIdentifiant id)
-              | _ -> Ident infoAstId
+              | InfoVar _ -> Ident(infoAstId)
+              | InfoConst(_,e) -> Entier(e)
+              | _ -> raise (MauvaiseUtilisationIdentifiant id)
       end
-    | AstSyntax.AppelFonction (id, le) -> 
-      match (chercherGlobalement tds id) with
-        | None -> raise (IdentifiantNonDeclare id)
-        | Some infoAstId -> 
-          match (info_ast_to_info infoAstId) with
-            | InfoFun (id, _, _) -> AppelFonction(infoAstId, List.map (analyse_tds_expression tds) le)
-            | _ -> raise (MauvaiseUtilisationIdentifiant id)
+    | AstSyntax.AppelFonction (id, le) ->
+      begin
+        match (chercherGlobalement tds id) with
+          | None -> raise (IdentifiantNonDeclare id)
+          | Some infoAstId -> 
+            match (info_ast_to_info infoAstId) with
+              | InfoFun _ -> AppelFonction(infoAstId, List.map (analyse_tds_expression tds) le)
+              | _ -> raise (MauvaiseUtilisationIdentifiant id)
+      end
+      
 
 
 
@@ -165,6 +169,7 @@ and analyse_tds_bloc tds li =
    nli
 
 
+
 (* analyser_tds_param : tds * expression list -> (typ * info_ast)list *)
 (* Paramètre tds : la table des symboles locale *)
 (* Paramètre : la liste des paramètres à analyser *)
@@ -202,8 +207,9 @@ let analyse_tds_fonction maintds (AstSyntax.Fonction(t,n,lp,li,e))  =
                 AstTds.Fonction(t,info_ast_f,info_param,linstru_analysees,retour_analyse)
                 
     end
-
   
+
+
 
 (* analyser : AstSyntax.ast -> AstTds.ast *)
 (* Paramètre : le programme à analyser *)
@@ -212,8 +218,7 @@ en un programme de type AstTds.ast *)
 (* Erreur si mauvaise utilisation des identifiants *)
 let analyser (AstSyntax.Programme (fonctions,prog)) =
   let tds = creerTDSMere () in
-  (* let nf = List.map (analyse_tds_fonction tds) fonctions in *)
-  let nf = [] in
+  let nf = List.map (analyse_tds_fonction tds) fonctions in
   let nb = analyse_tds_bloc tds prog in
   Programme (nf,nb)
 
