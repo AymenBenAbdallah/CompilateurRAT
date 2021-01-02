@@ -42,11 +42,11 @@ open PasseTdsRat
 module CompilateurRat = Compilateur (PasseTdsRat) (PasseTypeNop) (PasseNop) (PasseCodeNopNop) 
 
 (* + passe de typage *)
-(*
+
 open PasseTdsRat
 open PasseTypeRat
 module CompilateurRat = Compilateur (PasseTdsRat) (PasseTypeRat) (PassePlacementNop) (PasseCodeNopNop)
-*)
+
 
 (* + passe de placement mémoire *)
 (*
