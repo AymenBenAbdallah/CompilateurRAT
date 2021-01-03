@@ -1,0 +1,120 @@
+# dune runtest
+# OCAMLPARAM: unset
+# Workspace root: /home/aymen/Documents/N7/TDL/CompilateurRAT/sourceEtu
+$ /usr/bin/nproc > /tmp/dune8a1c5c.output 2> /dev/null
+# Auto-detected concurrency: 8
+# disable binary cache
+$ /root/.opam/4.07.1/bin/ocamlc.opt -config > /tmp/dune45ad6a.output
+# Dune context:
+#  { name = "default"
+#  ; kind = "default"
+#  ; profile = Dyn
+#  ; merlin = true
+#  ; for_host = None
+#  ; fdo_target_exe = None
+#  ; build_dir = "default"
+#  ; toplevel_path = Some External "/root/.opam/4.07.1/lib/toplevel"
+#  ; ocaml_bin = External "/root/.opam/4.07.1/bin"
+#  ; ocaml = Ok External "/root/.opam/4.07.1/bin/ocaml"
+#  ; ocamlc = External "/root/.opam/4.07.1/bin/ocamlc.opt"
+#  ; ocamlopt = Ok External "/root/.opam/4.07.1/bin/ocamlopt.opt"
+#  ; ocamldep = Ok External "/root/.opam/4.07.1/bin/ocamldep.opt"
+#  ; ocamlmklib = Ok External "/root/.opam/4.07.1/bin/ocamlmklib.opt"
+#  ; env =
+#      map
+#        { "INSIDE_DUNE" :
+#            "/home/aymen/Documents/N7/TDL/CompilateurRAT/sourceEtu/_build/default"
+#        ; "OCAMLFIND_IGNORE_DUPS_IN" :
+#            "/home/aymen/Documents/N7/TDL/CompilateurRAT/sourceEtu/_build/install/default/lib"
+#        ; "OCAMLPATH" :
+#            "/home/aymen/Documents/N7/TDL/CompilateurRAT/sourceEtu/_build/install/default/lib"
+#        ; "OCAMLTOP_INCLUDE_PATH" :
+#            "/home/aymen/Documents/N7/TDL/CompilateurRAT/sourceEtu/_build/install/default/lib/toplevel"
+#        ; "OCAML_COLOR" : "always"
+#        ; "OPAMCOLOR" : "always"
+#        }
+#  ; findlib_path = [ External "/root/.opam/4.07.1/lib" ]
+#  ; arch_sixtyfour = true
+#  ; natdynlink_supported = true
+#  ; supports_shared_libraries = true
+#  ; ocaml_config =
+#      { version = "4.07.1"
+#      ; standard_library_default = "/root/.opam/4.07.1/lib/ocaml"
+#      ; standard_library = "/root/.opam/4.07.1/lib/ocaml"
+#      ; standard_runtime = "/root/.opam/4.07.1/bin/ocamlrun"
+#      ; ccomp_type = "cc"
+#      ; c_compiler = "gcc"
+#      ; ocamlc_cflags =
+#          [ "-O2"; "-fno-strict-aliasing"; "-fwrapv"; "-fcommon"; "-fPIC" ]
+#      ; ocamlc_cppflags = [ "-D_FILE_OFFSET_BITS=64"; "-D_REENTRANT" ]
+#      ; ocamlopt_cflags =
+#          [ "-O2"; "-fno-strict-aliasing"; "-fwrapv"; "-fcommon" ]
+#      ; ocamlopt_cppflags = [ "-D_FILE_OFFSET_BITS=64"; "-D_REENTRANT" ]
+#      ; bytecomp_c_compiler =
+#          [ "gcc"
+#          ; "-O2"
+#          ; "-fno-strict-aliasing"
+#          ; "-fwrapv"
+#          ; "-fcommon"
+#          ; "-fPIC"
+#          ; "-D_FILE_OFFSET_BITS=64"
+#          ; "-D_REENTRANT"
+#          ]
+#      ; bytecomp_c_libraries = [ "-lm"; "-ldl"; "-lpthread" ]
+#      ; native_c_compiler =
+#          [ "gcc"
+#          ; "-O2"
+#          ; "-fno-strict-aliasing"
+#          ; "-fwrapv"
+#          ; "-fcommon"
+#          ; "-D_FILE_OFFSET_BITS=64"
+#          ; "-D_REENTRANT"
+#          ]
+#      ; native_c_libraries = [ "-lm"; "-ldl" ]
+#      ; cc_profile = [ "-pg" ]
+#      ; architecture = "amd64"
+#      ; model = "default"
+#      ; int_size = 63
+#      ; word_size = 64
+#      ; system = "linux"
+#      ; asm = [ "as" ]
+#      ; asm_cfi_supported = true
+#      ; with_frame_pointers = false
+#      ; ext_exe = ""
+#      ; ext_obj = ".o"
+#      ; ext_asm = ".s"
+#      ; ext_lib = ".a"
+#      ; ext_dll = ".so"
+#      ; os_type = "Unix"
+#      ; default_executable_name = "a.out"
+#      ; systhread_supported = true
+#      ; host = "x86_64-unknown-linux-gnu"
+#      ; target = "x86_64-unknown-linux-gnu"
+#      ; profiling = true
+#      ; flambda = false
+#      ; spacetime = false
+#      ; safe_string = false
+#      ; exec_magic_number = "Caml1999X023"
+#      ; cmi_magic_number = "Caml1999I024"
+#      ; cmo_magic_number = "Caml1999O023"
+#      ; cma_magic_number = "Caml1999A023"
+#      ; cmx_magic_number = "Caml1999Y023"
+#      ; cmxa_magic_number = "Caml1999Z023"
+#      ; ast_impl_magic_number = "Caml1999M023"
+#      ; ast_intf_magic_number = "Caml1999N023"
+#      ; cmxs_magic_number = "Caml1999D023"
+#      ; cmt_magic_number = "Caml1999T024"
+#      ; natdynlink_supported = true
+#      ; supports_shared_libraries = true
+#      ; windows_unicode = false
+#      }
+#  }
+$ (cd _build/default && .ppx/423b3c0918a91461d11b9cd1259aca91/ppx.exe --cookie 'library-name="rat"' -o testTam.pp.ml --impl testTam.ml -corrected-suffix .ppx-corrected -diff-cmd - -dump-ast)
+$ (cd _build/default && /root/.opam/4.07.1/bin/ocamldep.opt -modules -impl testTam.pp.ml) > _build/default/.rat.objs/testTam.pp.ml.d
+$ (cd _build/default && /root/.opam/4.07.1/bin/ocamlc.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -warn-error -A -g -bin-annot -I .rat.objs/byte -I /root/.opam/4.07.1/lib/base -I /root/.opam/4.07.1/lib/base/base_internalhash_types -I /root/.opam/4.07.1/lib/base/caml -I /root/.opam/4.07.1/lib/base/shadow_stdlib -I /root/.opam/4.07.1/lib/fieldslib -I /root/.opam/4.07.1/lib/ppx_compare/runtime-lib -I /root/.opam/4.07.1/lib/ppx_expect/collector -I /root/.opam/4.07.1/lib/ppx_expect/common -I /root/.opam/4.07.1/lib/ppx_expect/config -I /root/.opam/4.07.1/lib/ppx_here/runtime-lib -I /root/.opam/4.07.1/lib/ppx_inline_test/config -I /root/.opam/4.07.1/lib/ppx_inline_test/runtime-lib -I /root/.opam/4.07.1/lib/ppx_sexp_conv/runtime-lib -I /root/.opam/4.07.1/lib/sexplib0 -no-alias-deps -opaque -open Rat -o .rat.objs/byte/rat__TestTam.cmo -c -impl testTam.pp.ml)
+$ (cd _build/default && /root/.opam/4.07.1/bin/ocamlopt.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -warn-error -A -g -I .rat.objs/byte -I .rat.objs/native -I /root/.opam/4.07.1/lib/base -I /root/.opam/4.07.1/lib/base/base_internalhash_types -I /root/.opam/4.07.1/lib/base/caml -I /root/.opam/4.07.1/lib/base/shadow_stdlib -I /root/.opam/4.07.1/lib/fieldslib -I /root/.opam/4.07.1/lib/ppx_compare/runtime-lib -I /root/.opam/4.07.1/lib/ppx_expect/collector -I /root/.opam/4.07.1/lib/ppx_expect/common -I /root/.opam/4.07.1/lib/ppx_expect/config -I /root/.opam/4.07.1/lib/ppx_here/runtime-lib -I /root/.opam/4.07.1/lib/ppx_inline_test/config -I /root/.opam/4.07.1/lib/ppx_inline_test/runtime-lib -I /root/.opam/4.07.1/lib/ppx_sexp_conv/runtime-lib -I /root/.opam/4.07.1/lib/sexplib0 -intf-suffix .ml -no-alias-deps -opaque -open Rat -o .rat.objs/native/rat__TestTam.cmx -c -impl testTam.pp.ml)
+$ (cd _build/default && /root/.opam/4.07.1/bin/ocamlopt.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62-40 -strict-sequence -strict-formats -short-paths -keep-locs -warn-error -A -g -a -o rat.cmxa .rat.objs/native/rat.cmx .rat.objs/native/rat__Type.cmx .rat.objs/native/rat__Tds.cmx .rat.objs/native/rat__Ast.cmx .rat.objs/native/rat__Code.cmx .rat.objs/native/rat__Exceptions.cmx .rat.objs/native/rat__Parser.cmx .rat.objs/native/rat__Lexer.cmx .rat.objs/native/rat__Passe.cmx .rat.objs/native/rat__PasseCodeRatToTam.cmx .rat.objs/native/rat__PassePlacementRat.cmx .rat.objs/native/rat__PasseTdsRat.cmx .rat.objs/native/rat__PasseTypeRat.cmx .rat.objs/native/rat__Compilateur.cmx .rat.objs/native/rat__TestType.cmx .rat.objs/native/rat__TestTam.cmx .rat.objs/native/rat__TestTDS.cmx .rat.objs/native/rat__TestPlacement.cmx)
+$ (cd _build/default && /root/.opam/4.07.1/bin/ocamlc.opt -w -24 -g -bin-annot -I .rat.inline-tests/.rat.inline-tests.eobjs/byte -I /root/.opam/4.07.1/lib/base -I /root/.opam/4.07.1/lib/base/base_internalhash_types -I /root/.opam/4.07.1/lib/base/caml -I /root/.opam/4.07.1/lib/base/shadow_stdlib -I /root/.opam/4.07.1/lib/fieldslib -I /root/.opam/4.07.1/lib/ppx_assert/runtime-lib -I /root/.opam/4.07.1/lib/ppx_compare/runtime-lib -I /root/.opam/4.07.1/lib/ppx_expect/collector -I /root/.opam/4.07.1/lib/ppx_expect/common -I /root/.opam/4.07.1/lib/ppx_expect/config -I /root/.opam/4.07.1/lib/ppx_expect/evaluator -I /root/.opam/4.07.1/lib/ppx_expect/matcher -I /root/.opam/4.07.1/lib/ppx_here/runtime-lib -I /root/.opam/4.07.1/lib/ppx_inline_test/config -I /root/.opam/4.07.1/lib/ppx_inline_test/runner/lib -I /root/.opam/4.07.1/lib/ppx_inline_test/runtime-lib -I /root/.opam/4.07.1/lib/ppx_sexp_conv/runtime-lib -I /root/.opam/4.07.1/lib/ppxlib/print_diff -I /root/.opam/4.07.1/lib/re -I /root/.opam/4.07.1/lib/seq -I /root/.opam/4.07.1/lib/sexplib0 -I /root/.opam/4.07.1/lib/stdio -I /root/.opam/4.07.1/lib/variantslib -I .rat.objs/byte -I .rat.objs/native -no-alias-deps -o .rat.inline-tests/.rat.inline-tests.eobjs/byte/dune__exe__Inline_test_runner_rat.cmo -c -impl .rat.inline-tests/inline_test_runner_rat.ml-gen)
+$ (cd _build/default && /root/.opam/4.07.1/bin/ocamlopt.opt -w -24 -g -I .rat.inline-tests/.rat.inline-tests.eobjs/byte -I .rat.inline-tests/.rat.inline-tests.eobjs/native -I /root/.opam/4.07.1/lib/base -I /root/.opam/4.07.1/lib/base/base_internalhash_types -I /root/.opam/4.07.1/lib/base/caml -I /root/.opam/4.07.1/lib/base/shadow_stdlib -I /root/.opam/4.07.1/lib/fieldslib -I /root/.opam/4.07.1/lib/ppx_assert/runtime-lib -I /root/.opam/4.07.1/lib/ppx_compare/runtime-lib -I /root/.opam/4.07.1/lib/ppx_expect/collector -I /root/.opam/4.07.1/lib/ppx_expect/common -I /root/.opam/4.07.1/lib/ppx_expect/config -I /root/.opam/4.07.1/lib/ppx_expect/evaluator -I /root/.opam/4.07.1/lib/ppx_expect/matcher -I /root/.opam/4.07.1/lib/ppx_here/runtime-lib -I /root/.opam/4.07.1/lib/ppx_inline_test/config -I /root/.opam/4.07.1/lib/ppx_inline_test/runner/lib -I /root/.opam/4.07.1/lib/ppx_inline_test/runtime-lib -I /root/.opam/4.07.1/lib/ppx_sexp_conv/runtime-lib -I /root/.opam/4.07.1/lib/ppxlib/print_diff -I /root/.opam/4.07.1/lib/re -I /root/.opam/4.07.1/lib/seq -I /root/.opam/4.07.1/lib/sexplib0 -I /root/.opam/4.07.1/lib/stdio -I /root/.opam/4.07.1/lib/variantslib -I .rat.objs/byte -I .rat.objs/native -intf-suffix .ml-gen -nodynlink -no-alias-deps -o .rat.inline-tests/.rat.inline-tests.eobjs/native/dune__exe__Inline_test_runner_rat.cmx -c -impl .rat.inline-tests/inline_test_runner_rat.ml-gen)
+$ (cd _build/default && /root/.opam/4.07.1/bin/ocamlopt.opt -w -24 -g -o .rat.inline-tests/inline_test_runner_rat.exe /root/.opam/4.07.1/lib/ocaml/unix.cmxa -I /root/.opam/4.07.1/lib/ocaml /root/.opam/4.07.1/lib/base/base_internalhash_types/base_internalhash_types.cmxa -I /root/.opam/4.07.1/lib/base/base_internalhash_types /root/.opam/4.07.1/lib/base/caml/caml.cmxa /root/.opam/4.07.1/lib/sexplib0/sexplib0.cmxa /root/.opam/4.07.1/lib/base/shadow_stdlib/shadow_stdlib.cmxa /root/.opam/4.07.1/lib/base/base.cmxa -I /root/.opam/4.07.1/lib/base /root/.opam/4.07.1/lib/ppx_inline_test/config/inline_test_config.cmxa /root/.opam/4.07.1/lib/ppx_inline_test/runtime-lib/ppx_inline_test_lib.cmxa /root/.opam/4.07.1/lib/ppx_here/runtime-lib/ppx_here_lib.cmxa /root/.opam/4.07.1/lib/ppx_sexp_conv/runtime-lib/ppx_sexp_conv_lib.cmxa /root/.opam/4.07.1/lib/ppx_compare/runtime-lib/ppx_compare_lib.cmxa /root/.opam/4.07.1/lib/ppx_expect/common/expect_test_common.cmxa /root/.opam/4.07.1/lib/ppx_expect/config/expect_test_config.cmxa /root/.opam/4.07.1/lib/fieldslib/fieldslib.cmxa /root/.opam/4.07.1/lib/ppx_expect/collector/expect_test_collector.cmxa -I /root/.opam/4.07.1/lib/ppx_expect/collector rat.cmxa /root/.opam/4.07.1/lib/ppx_inline_test/runner/lib/ppx_inline_test_runner_lib.cmxa -I /root/.opam/4.07.1/lib/ppx_inline_test/runner/lib /root/.opam/4.07.1/lib/stdio/stdio.cmxa /root/.opam/4.07.1/lib/re/re.cmxa /root/.opam/4.07.1/lib/variantslib/variantslib.cmxa /root/.opam/4.07.1/lib/ppx_assert/runtime-lib/ppx_assert_lib.cmxa /root/.opam/4.07.1/lib/ppx_expect/matcher/expect_test_matcher.cmxa /root/.opam/4.07.1/lib/ppxlib/print_diff/ppxlib_print_diff.cmxa /root/.opam/4.07.1/lib/ppx_expect/evaluator/ppx_expect_evaluator.cmxa .rat.inline-tests/.rat.inline-tests.eobjs/native/dune__exe__Inline_test_runner_rat.cmx -linkall)
+$ (cd _build/default && .rat.inline-tests/inline_test_runner_rat.exe inline-test-runner rat -source-tree-root . -diff-cmd -)
