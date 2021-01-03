@@ -1,225 +1,221 @@
-(* Module de la passe de gestion des identifiants *)
+(* Module de la passe de Typage *)
 module PasseTypeRat : Passe.Passe with type t1 = Ast.AstTds.programme and type t2 = Ast.AstType.programme =
 struct
 
+  open Type
   open Tds
   open Exceptions
   open Ast
-  open AstTds
+  open AstType
 
   type t1 = Ast.AstTds.programme
   type t2 = Ast.AstType.programme
 
 
-(* analyse_tds_expression : AstTds.expression -> AstTds.expression *)
-(* Paramètre tds : la table des symboles courante *)
+(* analyse_type_expression : AstTds.expression -> AstType.expression *)
 (* Paramètre e : l'expression à analyser *)
-(* Vérifie la bonne utilisation des identifiants et tranforme l'expression
-en une expression de type AstTds.expression *)
-(* Erreur si mauvaise utilisation des identifiants *)
-let rec analyse_tds_expression tds e = 
+(* Vérifie la bonne cohérence des types utilisés et tranforme l'expression
+en une expression de type AstType.expression *)
+(* Erreur si cohérence entre les types utilisés *)
+let rec analyse_type_expression e = 
   match e with
-    | AstTds.True -> True
-    | AstTds.False -> False
-    | AstTds.Entier n -> Entier n
+    | AstTds.True -> (Type.Bool, AstType.True)
+    | AstTds.False -> (Type.Bool, False)
+    | AstTds.Entier n -> (Type.Int, Entier n)
     | AstTds.Binaire (b, e1, e2) -> 
-      let ne1 = analyse_tds_expression tds e1 in
-      let ne2 = analyse_tds_expression tds e2 in
-      Binaire(b, ne1, ne2)
-    | AstTds.Rationnel(e1, e2) ->
-      let ne1 = analyse_tds_expression tds e1 in
-      let ne2 = analyse_tds_expression tds e2 in
-      Rationnel(ne1, ne2)
-    | AstTds.Numerateur e ->
-      let ne = analyse_tds_expression tds e in
-      Numerateur ne
-    | AstTds.Denominateur e ->
-      let ne = analyse_tds_expression tds e in
-      Denominateur ne
-    | AstTds.Ident id ->
-      begin
-        match chercherGlobalement tds id with
-          | None -> raise (IdentifiantNonDeclare id)
-          | Some infoAstId ->
-            match (info_ast_to_info infoAstId) with
-              | InfoVar _ -> Ident(infoAstId)
-              | InfoConst(_,e) -> Entier(e)
-              | _ -> raise (MauvaiseUtilisationIdentifiant id)
-      end
-    | AstTds.AppelFonction (id, le) ->
-      begin
-        match (chercherGlobalement tds id) with
-          | None -> raise (IdentifiantNonDeclare id)
-          | Some infoAstId -> 
-            match (info_ast_to_info infoAstId) with
-              | InfoFun _ -> AppelFonction(infoAstId, List.map (analyse_tds_expression tds) le)
-              | _ -> raise (MauvaiseUtilisationIdentifiant id)
-      end
-      
-
-
-
-(* analyse_tds_instruction : AstTds.instruction -> tds -> AstTds.instruction *)
-(* Paramètre tds : la table des symboles courante *)
-(* Paramètre i : l'instruction à analyser *)
-(* Vérifie la bonne utilisation des identifiants et tranforme l'instruction
-en une instruction de type AstTds.instruction *)
-(* Erreur si mauvaise utilisation des identifiants *)
-let rec analyse_tds_instruction tds i =
-  match i with
-  | AstTds.Declaration (t, n, e) ->
-      begin
-        match chercherLocalement tds n with
-        | None ->
-            (* L'identifiant n'est pas trouvé dans la tds locale, 
-            il n'a donc pas été déclaré dans le bloc courant *)
-            (* Vérification de la bonne utilisation des identifiants dans l'expression *)
-            (* et obtention de l'expression transformée *) 
-            let ne = analyse_tds_expression tds e in
-            (* Création de l'information associée à l'identfiant *)
-            let info = InfoVar (n,Undefined, 0, "") in
-            (* Création du pointeur sur l'information *)
-            let ia = info_to_info_ast info in
-            (* Ajout de l'information (pointeur) dans la tds *)
-            ajouter tds n ia;
-            (* Renvoie de la nouvelle déclaration où le nom a été remplacé par l'information 
-            et l'expression remplacée par l'expression issue de l'analyse *)
-            Declaration (t, ne, ia) 
-        | Some _ ->
-            (* L'identifiant est trouvé dans la tds locale, 
-            il a donc déjà été déclaré dans le bloc courant *) 
-            raise (DoubleDeclaration n)
-      end
-  | AstTds.Affectation (n,e) ->
-      begin
-        match chercherGlobalement tds n with
-        | None -> 
-          (* L'identifiant n'est pas trouvé dans la tds globale. *) 
-          raise (IdentifiantNonDeclare n)
-        | Some info -> 
-          (* L'identifiant est trouvé dans la tds globale, 
-          il a donc déjà été déclaré. L'information associée est récupérée. *) 
+    begin
+      let (te1, ne1) = analyse_type_expression e1 in
+      let (te2, ne2) = analyse_type_expression e2 in
+      match b with
+        | Plus -> 
           begin
-            match info_ast_to_info info with
-            | InfoVar _ -> 
-              (* Vérification de la bonne utilisation des identifiants dans l'expression *)
-              (* et obtention de l'expression transformée *) 
-              let ne = analyse_tds_expression tds e in
-              (* Renvoie de la nouvelle affectation où le nom a été remplacé par l'information 
-              et l'expression remplacée par l'expression issue de l'analyse *)
-               Affectation (ne, info)
-            |  _ ->
-              (* Modification d'une constante ou d'une fonction *)  
-              raise (MauvaiseUtilisationIdentifiant n) 
+            if ((Type.est_compatible te1 Type.Int) && (Type.est_compatible te2 Type.Int)) then 
+              (Type.Int, Binaire (PlusInt, ne1, ne2))
+            else if ((Type.est_compatible te1 Type.Rat) && (Type.est_compatible te2 Type.Rat)) then
+              (Type.Rat, Binaire (PlusRat, ne1, ne2))
+            else
+              raise (TypeBinaireInattendu(b, te1, te2))
+          end
+        | Mult -> 
+          begin
+            if ((Type.est_compatible te1 Type.Int) && ((Type.est_compatible te2 Type.Int))) then
+              (Type.Int, Binaire (MultInt, ne1, ne2))
+            else if ((Type.est_compatible te1 Type.Rat) && ((Type.est_compatible te2 Type.Rat))) then
+              (Type.Rat, Binaire (MultRat, ne1, ne2))
+            else 
+              raise (TypeBinaireInattendu(b,te1,te2))
+          end
+        | Equ -> 
+          begin
+            if ((Type.est_compatible te1 Type.Int) && ((Type.est_compatible te2 Type.Int))) then
+              (Type.Bool, Binaire (EquInt, ne1,ne2))
+            else if ((Type.est_compatible te1 Type.Bool) && ((Type.est_compatible te2 Type.Bool))) then
+              (Type.Bool, Binaire (EquBool,ne1,ne2))
+            else 
+              raise (TypeBinaireInattendu (b,te1,te2))
+          end
+        | Inf -> 
+          begin
+              if ((Type.est_compatible te1 Type.Int) && ((Type.est_compatible te2 Type.Int))) then
+                (Type.Bool, Binaire (Inf,ne1,ne2))
+              else 
+                raise (TypeBinaireInattendu (b,te1,te2))
           end
       end
-  | AstTds.Constante (n,v) -> 
+    | AstTds.Rationnel(e1, e2) ->
       begin
-        match chercherLocalement tds n with
-        | None -> 
-        (* L'identifiant n'est pas trouvé dans la tds locale, 
-        il n'a donc pas été déclaré dans le bloc courant *)
-        (* Ajout dans la tds de la constante *)
-        ajouter tds n (info_to_info_ast (InfoConst (n,v))); 
-        (* Suppression du noeud de déclaration des constantes devenu inutile *)
-        Empty
-        | Some _ ->
-          (* L'identifiant est trouvé dans la tds locale, 
-          il a donc déjà été déclaré dans le bloc courant *) 
-          raise (DoubleDeclaration n)
+        let (te1,ne1) = analyse_type_expression e1 in
+        let (te2,ne2) = analyse_type_expression e2 in
+        match ((est_compatible te1 Type.Int),(est_compatible te2 Type.Int)) with
+          | (true,true) -> (Type.Rat, Rationnel (ne1,ne2))
+          | (true,false) -> raise (TypeInattendu (te2, Type.Int))
+          | (false,true) -> raise (TypeInattendu (te1, Type.Int))
+          | (false,false) -> raise (TypesParametresInattendus([te1; te2], [Type.Int; Type.Int]))
       end
-  | AstTds.Affichage e -> 
-      (* Vérification de la bonne utilisation des identifiants dans l'expression *)
-      (* et obtention de l'expression transformée *)
-      let ne = analyse_tds_expression tds e in
-      (* Renvoie du nouvel affichage où l'expression remplacée par l'expression issue de l'analyse *)
-      Affichage (ne)
-  | AstTds.Conditionnelle (c,t,e) -> 
-      (* Analyse de la condition *)
-      let nc = analyse_tds_expression tds c in
-      (* Analyse du bloc then *)
-      let tast = analyse_tds_bloc tds t in
-      (* Analyse du bloc else *)
-      let east = analyse_tds_bloc tds e in
-      (* Renvoie la nouvelle structure de la conditionnelle *)
-      Conditionnelle (nc, tast, east)
-  | AstTds.TantQue (c,b) -> 
-      (* Analyse de la condition *)
-      let nc = analyse_tds_expression tds c in
-      (* Analyse du bloc *)
-      let bast = analyse_tds_bloc tds b in
-      (* Renvoie la nouvelle structure de la boucle *)
-      TantQue (nc, bast)
+    | AstTds.Numerateur e ->
+      begin
+        let (te,ne)=(analyse_type_expression e) in
+        if (est_compatible te Type.Rat) then 
+          (Type.Int, Numerateur ne)
+        else 
+          raise (TypeInattendu (te, Type.Rat))
+      end
+    | AstTds.Denominateur e ->
+      begin
+        let (te,ne)=(analyse_type_expression e) in
+        if (est_compatible te Type.Rat) then 
+          (Type.Int, Denominateur ne)
+        else 
+          raise (TypeInattendu (te, Type.Rat))
+      end
+    | AstTds.Ident info_ast ->
+      begin 
+        let info = info_ast_to_info info_ast in
+        match info with 
+          |InfoVar(_,t,_,_) -> (t, Ident(info_ast))
+          |InfoFun _ -> raise (MauvaiseUtilisationIdentifiant "")
+          |InfoConst (_,n) -> (Int, Entier n)
+      end
+    | AstTds.AppelFonction (info_ast, le) ->
+      begin
+        let i= (info_ast_to_info info_ast) in
+        match i with
+          | (InfoFun(_,tRetour,tParam)) -> 
+            begin
+              let nle = List.map (analyse_type_expression) le in
+              let (types, nlexp)=((List.map (fst) nle),(List.map (snd) nle)) in
+              if (est_compatible_list types tParam) then 
+                (tRetour, AppelFonction(info_ast, nlexp))
+              else raise (TypesParametresInattendus (tParam,types))
+            end
+          | _ -> failwith "error"
+      end
 
-      
-(* analyse_tds_bloc : AstTds.bloc -> AstTds.bloc *)
-(* Paramètre tds : la table des symboles courante *)
+
+(* analyse_type_instruction : AstTds.instruction -> tds -> AstType.instruction *)
+(* Paramètre i : l'instruction à analyser *)
+(* Vérifie la cohérence des types et tranforme l'instruction
+en une instruction de type AstTds.instruction *)
+(* Erreur si non cohérence des types *)
+let rec analyse_type_instruction i =
+  match i with
+  | AstTds.Declaration (t, e, info_ast) ->
+      begin
+        let (te, ne) = analyse_type_expression e in
+        if (est_compatible te t) then
+          begin
+            let _ = modifier_type_info te info_ast in
+            AstType.Declaration(ne,info_ast)
+          end
+        else
+          raise (TypeInattendu(te,t))
+      end
+      | AstTds.Affectation (e,info) ->
+      begin
+        let (te, ne) = analyse_type_expression e in 
+        begin
+          match info_ast_to_info info with
+            |InfoVar(_,t,_,_) -> 
+            begin
+              match (est_compatible te t) with
+              | true -> 
+                AstType.Affectation(ne, info);
+              | false -> 
+                raise (TypeInattendu(te,t))
+            end
+            | _ -> failwith("Error")
+        end
+
+      end
+        
+      | AstTds.Affichage e -> 
+      begin
+        let (te,ne)=(analyse_type_expression e) in
+          begin
+            if (est_compatible te Type.Int) then 
+              (AffichageInt ne)
+            else if (est_compatible te Type.Rat) then 
+              (AffichageRat ne)
+            else 
+              (AffichageBool ne)
+          end
+      end
+
+      | AstTds.Conditionnelle (c,t,e) -> 
+      begin
+        let (tc,nc) = analyse_type_expression c in
+        if (est_compatible tc Type.Bool) then 
+          let analyse_then = analyse_type_bloc t in
+          let analyse_else = analyse_type_bloc e in
+          Conditionnelle(nc,analyse_then,analyse_else)
+        else 
+          raise (TypeInattendu(tc,Type.Bool))
+      end
+
+      | AstTds.TantQue (c,b) -> 
+      begin
+        let (tc,nc) = analyse_type_expression c in
+        if (est_compatible tc Type.Bool) then 
+          let analyse_bloc = analyse_type_bloc b in
+          AstType.TantQue(nc, analyse_bloc)
+        else raise (TypeInattendu(tc, Type.Bool))
+      end
+      | AstTds.Empty -> Empty
+
+
+(* analyse_type_bloc : AstTds.bloc -> AstType.bloc *)
 (* Paramètre li : liste d'instructions à analyser *)
-(* Vérifie la bonne utilisation des identifiants et tranforme le bloc
-en un bloc de type AstTds.bloc *)
-(* Erreur si mauvaise utilisation des identifiants *)
-and analyse_tds_bloc tds li =
-  (* Entrée dans un nouveau bloc, donc création d'une nouvelle tds locale 
-  pointant sur la table du bloc parent *)
-  let tdsbloc = creerTDSFille tds in
-  (* Analyse des instructions du bloc avec la tds du nouveau bloc 
-  Cette tds est modifiée par effet de bord *)
-   let nli = List.map (analyse_tds_instruction tdsbloc) li in
-   (* afficher_locale tdsbloc ; *) (* décommenter pour afficher la table locale *)
-   nli
+(* Vérifie la cohérence des types et tranforme le bloc
+en un bloc de type AstType.bloc *)
+(* Erreur si non cohérence des types *)
+and analyse_type_bloc li =
+  List.map analyse_type_instruction li
+   
 
-
-
-(* analyser_tds_param : tds * expression list -> (typ * info_ast)list *)
-(* Paramètre tds : la table des symboles locale *)
-(* Paramètre : la liste des paramètres à analyser *)
-(* Analyse les paramètres en entrée d'une fonction *)
-(* Erreur si double declaration d'un même paramètre *)
-let analyser_tds_param (tdsLocale,liste_param) = 
-  List.fold_right (fun (typp,nom_param) tq -> match (chercherLocalement tdsLocale nom_param) with
-                                              | None -> (let info_p = Tds.InfoVar (nom_param,typp,0,"") in
-                                                        let info_ast_p =  Tds.info_to_info_ast info_p in
-                                                        Tds.ajouter tdsLocale nom_param info_ast_p;
-                                                        (typp,info_ast_p)::tq)
-                                              | Some _ -> (raise (DoubleDeclaration nom_param))) liste_param []
-
-
-
-(* analyse_tds_fonction : AstTds.fonction -> AstTds.fonction *)
-(* Paramètre tds : la table des symboles courante *)
+(* analyse_type_fonction : AstTds.fonction -> AstType.fonction *)
 (* Paramètre : la fonction à analyser *)
-(* Vérifie la bonne utilisation des identifiants et tranforme la fonction
-en une fonction de type AstTds.fonction *)
-(* Erreur si mauvaise utilisation des identifiants *)
-let analyse_tds_fonction maintds (AstTds.Fonction(t,n,lp,li,e))  = 
-  match chercherGlobalement maintds n with
-    | Some _ -> (raise (DoubleDeclaration n))
-    | None -> begin
-                let types_param = List.map (fst) lp in
-                let infof = Tds.InfoFun (n,t,types_param) in
-                let info_ast_f = (Tds.info_to_info_ast infof) in
-                let tdsLocale = creerTDSFille maintds in
-                ajouter tdsLocale n (info_to_info_ast (Tds.InfoFun (n,t,types_param)));
-                let info_param = analyser_tds_param (tdsLocale,lp) in
-                let linstru_analysees = List.map (analyse_tds_instruction tdsLocale) li in
-                let retour_analyse = analyse_tds_expression tdsLocale e in
-                ajouter maintds n (info_to_info_ast (Tds.InfoFun (n,t,types_param)));
-                AstTds.Fonction(t,info_ast_f,info_param,linstru_analysees,retour_analyse)
-                
-    end
-  
+(* Vérifie la cohérence des types et tranforme la fonction
+en une fonction de type AstType.fonction *)
+(* Erreur si non cohérence des types *)
+let analyse_type_fonction (AstTds.Fonction(t,info_ast,info_param,li,retour))  = 
+  let ali = analyse_type_bloc li in
+  let (tr, nr) = analyse_type_expression retour in
+  let infoP = List.map (snd) info_param in
+  if (est_compatible tr t) then
+    Fonction(info_ast, infoP, ali, nr)
+  else
+    raise (TypeInattendu(tr,t))
 
 
 
-(* analyser : AstTds.ast -> AstTds.ast *)
+(* analyser : AstTds.ast -> AstType.ast *)
 (* Paramètre : le programme à analyser *)
-(* Vérifie la bonne utilisation des identifiants et tranforme le programme
-en un programme de type AstTds.ast *)
-(* Erreur si mauvaise utilisation des identifiants *)
-let analyser (AstTds.Programme (fonctions,prog)) =
-  let tds = creerTDSMere () in
-  let nf = List.map (analyse_tds_fonction tds) fonctions in
-  let nb = analyse_tds_bloc tds prog in
-  Programme (nf,nb)
+(* Vérifie la cohérence des types et tranforme le programme
+en un programme de type AstType.ast *)
+(* Erreur si non cohérence des types *)
+let analyser (AstTds.Programme (fonctions, prog)) =
+  let analyseF = List.map (analyse_type_fonction) fonctions in
+  let analyseB = analyse_type_bloc prog in
+  Programme (analyseF, analyseB)
 
 end
