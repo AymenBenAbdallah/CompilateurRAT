@@ -1,8 +1,41 @@
-(*open Compilateur
+open Compilateur
 open Exceptions
 
 exception ErreurNonDetectee;;
 
+
+(* ------------------------------ *)
+(* Test des pointeurs *)
+(* ------------------------------ *)
+let%test_unit "testDoubleDeclarationPointeur1" = 
+  try 
+    let _ = compiler "../../fichiersRat/src-rat-tds-test/testDoubleDeclarationPointeur1.rat"
+    in raise ErreurNonDetectee
+  with
+  | DoubleDeclaration("x") -> ()
+
+let%test_unit "testDoubleDeclarationPointeur3" = 
+  let _ = compiler "../../fichiersRat/src-rat-tds-test/testDoubleDeclarationPointeur3.rat" in ()
+
+let%test_unit "testDoubleDeclarationPointeur4" = 
+  try 
+    let _ = compiler "../../fichiersRat/src-rat-tds-test/testDoubleDeclarationPointeur4.rat" 
+    in raise ErreurNonDetectee
+  with
+  | DoubleDeclaration("a") -> () 
+
+  let%test_unit "testAffectationPointeur1" = 
+  let _ = compiler "../../fichiersRat/src-rat-tds-test/testAffectationPointeur1.rat" in ()
+
+let%test_unit "testAffectationPointeur2"= 
+  try 
+    let _ = compiler "../../fichiersRat/src-rat-tds-test/testAffectationPointeur2.rat" 
+    in raise ErreurNonDetectee
+  with
+  | IdentifiantNonDeclare("y") -> ()
+
+let%test_unit "testAffectationPointeur3" = 
+  let _ = compiler "../../fichiersRat/src-rat-tds-test/testAffectationPointeur3.rat" in ()
 
 (* ------------------------------ *)
 (* Sans fonction *)
@@ -356,5 +389,3 @@ let%test_unit "code_testfuns" =
 
 let%test_unit "code_complique" = 
   let _ = compiler   "../../fichiersRat/src-rat-tam-test/complique.rat" in ()
-
-*)

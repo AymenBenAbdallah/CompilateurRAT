@@ -26,6 +26,12 @@ let creerTDSMere () = Courante (Nulle, Hashtbl.create 100)
 
 let creerTDSFille mere = Courante (mere, Hashtbl.create 100)
 
+let creerTableFonc () = (Hashtbl.create 100)
+
+(* Ajouter une fonction ou un prototype (représenté(e) par son info_ast à la hashtable des fonctions*)
+let ajouter_fonc tableFonc nom info =
+  Hashtbl.add tableFonc nom info
+
 let ajouter tds nom info =
   match tds with
   | Nulle -> failwith "Ajout dans une table vide"
@@ -68,20 +74,25 @@ let afficher_globale tds =
                         else Hashtbl.iter ( fun n info -> (print_string (indent^n^" : "^(string_of_info (info_ast_to_info info))^"\n"))) c ; afficher m (indent^"  ")
   in afficher tds ""
 
+let get_type i =
+  match !i with
+    |InfoVar (_,t,_,_) -> t
+    |InfoConst(_,_) -> Int
+    |InfoFun(_,t,_) -> t
 
-  let modifier_type_info t i =
+let get_adresse i =
+  match !i with
+  |InfoVar(_,_,a,_) -> a
+  | _ -> failwith "Variable non valide"   
+
+let modifier_type_info t i =
+  match !i with
+  |InfoVar (n,_,dep,base) -> i:= InfoVar (n,t,dep,base)
+  | _ -> failwith "variable non valide"
+
+let modifier_adresse_info d b i =
     match !i with
-    |InfoVar (n,_,dep,base) -> i:= InfoVar (n,t,dep,base)
-    | _ -> failwith "Appel modifier_type_info pas sur un InfoVar"
- 
- let modifier_type_fonction_info t tp i =
-       match !i with
-       |InfoFun(n,_,_) -> i:= InfoFun(n,t,tp)
-       | _ -> failwith "Appel modifier_type_fonction_info pas sur un InfoFun"
- 
- let modifier_adresse_info d b i =
-     match !i with
-     |InfoVar (n,t,_,_) -> i:= InfoVar (n,t,d,b)
-     | _ -> failwith "Appel modifier_adresse_info pas sur un InfoVar"
-    
-   
+    |InfoVar (n,t,_,_) -> i:= InfoVar (n,t,d,b)
+    | _ -> failwith "variable non valide"
+  
+  

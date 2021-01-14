@@ -1,0 +1,14 @@
+int add1 (int* x int* y){
+  int a = *x;
+  int b = *y;
+  int z = (a+b);
+  return (z+1);
+}
+
+test{
+  int * a = (new int);
+  int * b = (new int);
+  *a = 4;
+  *b = 5;
+  int x = call add1 (a b 6);
+}

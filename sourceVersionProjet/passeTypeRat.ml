@@ -1,3 +1,4 @@
+
 (* Module de la passe de Typage *)
 module PasseTypeRat : Passe.Passe with type t1 = Ast.AstTds.programme and type t2 = Ast.AstType.programme =
 struct
@@ -11,6 +12,24 @@ struct
   type t1 = Ast.AstTds.programme
   type t2 = Ast.AstType.programme
 
+let rec get_type_affectable a = 
+  match a with
+    | AstTds.Ident(info) -> get_type info
+    | AstTds.Valeur(aff) -> Pointeur(get_type_affectable aff)
+
+(*let rec chercher_fonction_compatible liste_fonctions types e = 
+  match liste_fonctions with 
+  | [] -> raise (FonctionIncompatible)
+  | t::q ->  let i= (info_ast_to_info t) in
+    match i with
+      | (InfoFun(_,tr,tp)) -> 
+          begin
+            if (est_compatible_list types tp) then
+              t
+            else 
+              (chercher_fonction_compatible q types e)
+          end 
+      | _ -> failwith "Impossible"*)
 
 (* analyse_type_expression : AstTds.expression -> AstType.expression *)
 (* Paramètre e : l'expression à analyser *)
@@ -88,17 +107,17 @@ let rec analyse_type_expression e =
         else 
           raise (TypeInattendu (te, Type.Rat))
       end
-    | AstTds.Ident info_ast ->
+    (*| AstTds.Ident info_ast ->
       begin 
         let info = info_ast_to_info info_ast in
         match info with 
           |InfoVar(_,t,_,_) -> (t, Ident(info_ast))
           |InfoFun _ -> raise (MauvaiseUtilisationIdentifiant "")
           |InfoConst (_,n) -> (Int, Entier n)
-      end
+      end*)
     | AstTds.AppelFonction (info_ast, le) ->
-      begin
-        let i= (info_ast_to_info info_ast) in
+      (*begin
+        let i = (info_ast_to_info info_ast) in
         match i with
           | (InfoFun(_,tRetour,tParam)) -> 
             begin
@@ -108,9 +127,14 @@ let rec analyse_type_expression e =
                 (tRetour, AppelFonction(info_ast, nlexp))
               else raise (TypesParametresInattendus (tParam,types))
             end
-          | _ -> failwith "error"
-      end
-
+          | _ -> failwith "Cas Impossible"
+          
+      end*)
+        (Int, Null)
+    | AstTds.Acces(a) -> (get_type_affectable a, Acces(a))
+    | AstTds.Null -> (Pointeur(Undefined), Null)
+    | AstTds.New(t) -> (Pointeur(t), New(t))
+    | AstTds.Adresse(i) -> (Int, Adresse(i))
 
 (* analyse_type_instruction : AstTds.instruction -> tds -> AstType.instruction *)
 (* Paramètre i : l'instruction à analyser *)
@@ -120,67 +144,56 @@ en une instruction de type AstTds.instruction *)
 let rec analyse_type_instruction i =
   match i with
   | AstTds.Declaration (t, e, info_ast) ->
-      begin
-        let (te, ne) = analyse_type_expression e in
-        if (est_compatible te t) then
-          begin
-            let _ = modifier_type_info te info_ast in
-            AstType.Declaration(ne,info_ast)
-          end
-        else
-          raise (TypeInattendu(te,t))
-      end
-      | AstTds.Affectation (e,info) ->
-      begin
-        let (te, ne) = analyse_type_expression e in 
+    begin
+      let (te, ne) = analyse_type_expression e in
+      if (est_compatible te t) then
         begin
-          match info_ast_to_info info with
-            |InfoVar(_,t,_,_) -> 
-            begin
-              match (est_compatible te t) with
-              | true -> 
-                AstType.Affectation(ne, info);
-              | false -> 
-                raise (TypeInattendu(te,t))
-            end
-            | _ -> failwith("Error")
+          let _ = modifier_type_info te info_ast in
+          AstType.Declaration(ne,info_ast)
         end
-
-      end
-        
-      | AstTds.Affichage e -> 
-      begin
-        let (te,ne)=(analyse_type_expression e) in
-          begin
-            if (est_compatible te Type.Int) then 
-              (AffichageInt ne)
-            else if (est_compatible te Type.Rat) then 
-              (AffichageRat ne)
-            else 
-              (AffichageBool ne)
-          end
-      end
-
-      | AstTds.Conditionnelle (c,t,e) -> 
-      begin
-        let (tc,nc) = analyse_type_expression c in
-        if (est_compatible tc Type.Bool) then 
-          let analyse_then = analyse_type_bloc t in
-          let analyse_else = analyse_type_bloc e in
-          Conditionnelle(nc,analyse_then,analyse_else)
-        else 
-          raise (TypeInattendu(tc,Type.Bool))
-      end
-
-      | AstTds.TantQue (c,b) -> 
-      begin
-        let (tc,nc) = analyse_type_expression c in
-        if (est_compatible tc Type.Bool) then 
-          let analyse_bloc = analyse_type_bloc b in
-          AstType.TantQue(nc, analyse_bloc)
-        else raise (TypeInattendu(tc, Type.Bool))
-      end
-      | AstTds.Empty -> Empty
+      else
+        raise (TypeInattendu(te,t))
+    end
+  | AstTds.Affectation (aff, e) ->
+    begin
+      let (te,ne) = analyse_type_expression e in
+      let t = get_type_affectable aff in 
+      if (est_compatible te t) then
+        Affectation (ne, aff)
+      else
+        raise (TypeInattendu (te, t))
+    end        
+  | AstTds.Affichage e -> 
+    begin
+      let (te,ne)=(analyse_type_expression e) in
+        begin
+          if (est_compatible te Type.Int) then 
+            (AffichageInt ne)
+          else if (est_compatible te Type.Rat) then 
+            (AffichageRat ne)
+          else 
+            (AffichageBool ne)
+        end
+    end
+  | AstTds.Conditionnelle (c,t,e) ->
+    begin
+      let (tc,nc) = analyse_type_expression c in
+      if (est_compatible tc Type.Bool) then 
+        let analyse_then = analyse_type_bloc t in
+        let analyse_else = analyse_type_bloc e in
+        Conditionnelle(nc,analyse_then,analyse_else)
+      else 
+        raise (TypeInattendu(tc,Type.Bool))
+    end
+  | AstTds.TantQue (c,b) -> 
+    begin
+      let (tc,nc) = analyse_type_expression c in
+      if (est_compatible tc Type.Bool) then 
+        let analyse_bloc = analyse_type_bloc b in
+        AstType.TantQue(nc, analyse_bloc)
+      else raise (TypeInattendu(tc, Type.Bool))
+    end
+  | AstTds.Empty -> Empty
 
 
 (* analyse_type_bloc : AstTds.bloc -> AstType.bloc *)

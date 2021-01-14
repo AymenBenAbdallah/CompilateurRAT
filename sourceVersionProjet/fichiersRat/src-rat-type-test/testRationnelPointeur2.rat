@@ -1,0 +1,5 @@
+test{
+  int * px = (new int);
+  const a = 3;
+  rat x = [a/px];
+}

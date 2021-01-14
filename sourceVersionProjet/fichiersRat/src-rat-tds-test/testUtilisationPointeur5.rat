@@ -1,0 +1,10 @@
+int add (int a int b){
+  return (a+b);
+}
+
+test{
+  int * px = (new int);
+  const x = 3;
+  *px = x;
+  int z = (*px +1);
+}

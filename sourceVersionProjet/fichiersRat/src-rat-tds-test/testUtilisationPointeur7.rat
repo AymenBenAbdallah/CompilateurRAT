@@ -1,0 +1,9 @@
+int add (int* x int* y){
+  int * z = (new int);
+  *z = a;
+  return (*x+*y);
+}
+
+test{
+  int x =1;
+}

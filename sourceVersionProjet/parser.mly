@@ -35,6 +35,10 @@ open Ast.AstSyntax
 %token PLUS
 %token MULT
 %token INF
+%token NEW
+%token NULL
+%token PTR
+%token ADR
 %token EOF
 
 (* Type de l'attribut synthétisé des non-terminaux *)
@@ -43,6 +47,7 @@ open Ast.AstSyntax
 %type <fonction> fonc
 %type <instruction list> is
 %type <instruction> i
+%type <affectable> a
 %type <typ> typ
 %type <(typ*string) list> dp
 %type <expression> e 
@@ -69,11 +74,15 @@ is :
 
 i :
 | t=typ n=ID EQUAL e1=e PV          {Declaration (t,n,e1)}
-| n=ID EQUAL e1=e PV                {Affectation (n,e1)}
+| n=a EQUAL e1=e PV                 {Affectation (n,e1)}
 | CONST n=ID EQUAL e=ENTIER PV      {Constante (n,e)}
 | PRINT e1=e PV                     {Affichage (e1)}
 | IF exp=e li1=bloc ELSE li2=bloc   {Conditionnelle (exp,li1,li2)}
 | WHILE exp=e li=bloc               {TantQue (exp,li)}
+
+a:
+| MULT n=a                          {Valeur n}
+| n=ID                              {Ident n}
 
 dp :
 |                         {[]}
@@ -83,13 +92,13 @@ typ :
 | BOOL    {Bool}
 | INT     {Int}
 | RAT     {Rat}
+| t=typ MULT {Pointeur t}
 
 e : 
 | CALL n=ID PO lp=cp PF   {AppelFonction (n,lp)}
 | CO e1=e SLASH e2=e CF   {Rationnel(e1,e2)}
 | NUM e1=e                {Numerateur e1}
 | DENOM e1=e              {Denominateur e1}
-| n=ID                    {Ident n}
 | TRUE                    {True}
 | FALSE                   {False}
 | e=ENTIER                {Entier e}
@@ -97,7 +106,10 @@ e :
 | PO e1=e MULT e2=e PF    {Binaire (Mult,e1,e2)}
 | PO e1=e EQUAL e2=e PF   {Binaire (Equ,e1,e2)}
 | PO e1=e INF e2=e PF     {Binaire (Inf,e1,e2)}
-| PO exp=e PF             {exp}
+| n=a                     {Acces n}
+| NULL                    {Null}
+| PO NEW t=typ PF         {New t}
+| ADR addr=ID             {Adresse addr}
 
 cp :
 |               {[]}

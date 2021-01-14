@@ -1,0 +1,21 @@
+int add (int* a int* b){
+  int x = *a;
+  int y = *b;
+  return (x+y);
+}
+
+int add2 (int* a int* b){
+  int x = *a;
+  int y = *b;
+  return (x+y);
+}
+
+test{
+  int * x = (new int);
+  int y = 3;
+  *x = y ;
+  while (y = 3){
+    int * z = (new int);
+    rat * z = (new rat);
+ }
+}

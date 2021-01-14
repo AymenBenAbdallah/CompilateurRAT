@@ -3,6 +3,145 @@ open Exceptions
 
 exception ErreurNonDetectee
 
+let%test_unit "testDeclarationPointeur1"= 
+  let _ = compiler "../../fichiersRat/src-rat-type-test/testDeclarationPointeur1.rat" in ()
+
+let%test_unit "testDeclarationPointeur2"= 
+  let _ = compiler "../../fichiersRat/src-rat-type-test/testDeclarationPointeur2.rat" in ()
+
+
+let%test_unit "testDeclarationPointeur3"=
+ try
+   let _ = compiler "../../fichiersRat/src-rat-type-test/testDeclarationPointeur3.rat"
+   in raise ErreurNonDetectee
+ with
+ | TypeInattendu(Rat, Int) -> ()
+
+let%test_unit "testDeclarationPointeur4"=
+ try
+   let _ = compiler "../../fichiersRat/src-rat-type-test/testDeclarationPointeur4.rat"
+   in raise ErreurNonDetectee
+ with
+ | TypeInattendu((Pointeur Rat),(Pointeur Bool)) -> ()
+
+let%test_unit "testAffectationPointeur1"= 
+let _ = compiler "../../fichiersRat/src-rat-type-test/testAffectationPointeur1.rat" in ()
+
+let%test_unit "testAffectationPointeur2"= 
+  let _ = compiler "../../fichiersRat/src-rat-type-test/testAffectationPointeur2.rat" in ()
+
+let%test_unit "testAffectationPointeur3"= 
+  let _ = compiler "../../fichiersRat/src-rat-type-test/testAffectationPointeur3.rat" in ()
+
+let%test_unit "testAffectationPointeur4"= 
+  try
+    let _ = compiler "../../fichiersRat/src-rat-type-test/testAffectationPointeur4.rat"
+    in raise ErreurNonDetectee
+  with
+  | TypeInattendu(Rat,Int) -> ()
+
+let%test_unit "testAffectationPointeur5"= 
+  try
+    let _ = compiler "../../fichiersRat/src-rat-type-test/testAffectationPointeur5.rat"
+    in raise ErreurNonDetectee
+  with
+  | TypeInattendu(Bool,Int) -> ()
+
+  let%test_unit "testRepetitionPointeur"= 
+  try 
+    let _ = compiler "../../fichiersRat/src-rat-type-test/testRepetitionPointeur.rat"
+    in raise ErreurNonDetectee
+  with
+  | TypeInattendu((Pointeur Int),Bool) -> ()
+
+  let%test_unit "testRationnelPointeur1"= 
+  try 
+    let _ = compiler "../../fichiersRat/src-rat-type-test/testRationnelPointeur1.rat"
+    in raise ErreurNonDetectee
+  with
+  | TypeInattendu((Pointeur Int) ,Rat) -> ()
+  
+
+let%test_unit "testRationnelPointeur2"= 
+  try 
+    let _ = compiler "../../fichiersRat/src-rat-type-test/testRationnelPointeur2.rat"
+    in raise ErreurNonDetectee
+  with
+  | TypeInattendu((Pointeur Int),Int) -> ()
+
+
+let%test_unit "testRationnelPointeur3"= 
+  try 
+    let _ = compiler "../../fichiersRat/src-rat-type-test/testRationnelPointeur3.rat"
+    in raise ErreurNonDetectee
+  with
+  | TypeInattendu(Bool,Int) -> ()
+
+let%test_unit "testRationnelPointeur4"= 
+  try 
+    let _ = compiler "../../fichiersRat/src-rat-type-test/testRationnelPointeur4.rat"
+    in raise ErreurNonDetectee
+  with
+  | TypeInattendu(Rat,Int) -> ()
+
+  let%test_unit "testOperationPointeur1"= 
+  let _ = compiler "../../fichiersRat/src-rat-type-test/testOperationPointeur1.rat" in ()
+
+
+let%test_unit "testOperationPointeur2"= 
+  let _ = compiler "../../fichiersRat/src-rat-type-test/testOperationPointeur2.rat" in ()
+
+let%test_unit "testOperationPointeur3"= 
+  try
+    let _ = compiler "../../fichiersRat/src-rat-type-test/testOperationPointeur3.rat"
+    in raise ErreurNonDetectee
+  with
+  | AdresseNonAssociee("x") -> ()
+
+  let%test_unit "testAppelPointeur1"= 
+  let _ = compiler "../../fichiersRat/src-rat-type-test/testAppelPointeur1.rat" in ()
+
+let%test_unit "testAppelPointeur2"= 
+  let _ = compiler "../../fichiersRat/src-rat-type-test/testAppelPointeur2.rat" in ()
+
+let%test_unit "testAppelPointeur3"= 
+  let _ = compiler "../../fichiersRat/src-rat-type-test/testAppelPointeur3.rat" in ()
+
+let%test_unit "testAppelPointeur4"=
+  try
+    let _ = compiler "../../fichiersRat/src-rat-type-test/testAppelPointeur4.rat"
+    in raise ErreurNonDetectee
+  with
+  | TypesParametresInattendus _ -> ()
+
+let%test_unit "testAppelPointeur5"=
+  try
+    let _ = compiler "../../fichiersRat/src-rat-type-test/testAppelPointeur5.rat"
+    in raise ErreurNonDetectee
+  with
+  | TypesParametresInattendus _ -> ()
+
+let%test_unit "testAppelPointeur6"=
+  try
+    let _ = compiler "../../fichiersRat/src-rat-type-test/testAppelPointeur6.rat"
+    in raise ErreurNonDetectee
+  with
+  | TypesParametresInattendus _ -> ()
+
+let%test_unit "testAppelPointeur7"=
+  try
+    let _ = compiler "../../fichiersRat/src-rat-type-test/testAppelPointeur7.rat"
+    in raise ErreurNonDetectee
+  with
+  | TypesParametresInattendus _ -> ()
+
+let%test_unit "testAppelPointeur8"= 
+  try 
+    let _ = compiler "../../fichiersRat/src-rat-type-test/testAppelPointeur8.rat"
+    in raise ErreurNonDetectee
+  with
+  | TypeInattendu(Int,Bool) -> ()
+
 let%test_unit "testDeclaration1"= 
   let _ = compiler "../../fichiersRat/src-rat-type-test/testDeclaration1.rat" in ()
 
@@ -522,4 +661,3 @@ let _ = compiler   "../../fichiersRat/src-rat-tam-test/testfuns.rat" in ()
 
 let%test_unit "code_complique" = 
 let _ = compiler   "../../fichiersRat/src-rat-tam-test/complique.rat" in ()
-

@@ -1,0 +1,16 @@
+int add (int a int b){
+  int * x = (new int);
+  *x = 3;
+  int * x = (new int);
+  *x =4;
+  return (a+b);
+  }
+
+int add2 (int a int b){
+  return (a+b);
+}
+
+test{
+  int * x = (new int);
+  *x = 5;
+}

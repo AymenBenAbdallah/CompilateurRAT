@@ -1,0 +1,10 @@
+test{
+  int * x = (new int);
+  *x = 3;
+  int z = *x;
+  if (z <3){
+    rat y = [4/2];
+  } else{
+    rat y = [1/3];
+  }
+}

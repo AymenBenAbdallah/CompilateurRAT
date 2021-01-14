@@ -1,0 +1,13 @@
+int add1 (int* x int y){
+ int a = *x;
+  int b = y;
+  int z = (a+b);
+  return (z+1);
+}
+
+test{
+  int * px = (new int);
+  *px = 5;
+  const z =3;
+  int x = call add1(px z);
+ }

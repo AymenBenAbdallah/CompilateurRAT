@@ -1,0 +1,6 @@
+test{
+  int * px = (new int);
+  while px {
+    int x =3;
+  }
+}

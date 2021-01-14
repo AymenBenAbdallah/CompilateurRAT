@@ -1,0 +1,5 @@
+test{
+  bool * px = (new bool);
+  *px = true;
+  rat x = [*px/5];
+}

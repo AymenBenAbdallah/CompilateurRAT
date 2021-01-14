@@ -1,0 +1,16 @@
+int fact (int* i int n){
+  int res = 0;
+  if (*i =n){
+    res = *i;
+  }else{
+    res = ((*i) * call fact ((*i) (n+1)));
+    }
+   return res;
+  }
+
+  test{
+    int px = (new int);
+    *px = 5;
+    int x = call fact (px 1);
+    print x;
+  }
